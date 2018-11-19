@@ -1,0 +1,82 @@
+use regex
+use std
+
+pkg fltr =
+	const owo     : (line : byte[:] -> byte[:])
+	const ratchet : (line : byte[:] -> byte[:])
+
+	const lower : (line : byte[:] -> byte[:])
+	const upper : (line : byte[:] -> byte[:])
+
+	pkglocal generic Zptr : @a# = (0 : @a#)
+;;
+
+var re : struct
+	owo     : regex.regex#
+	owo1    : regex.regex#
+	ratchet : regex.regex#
+;;
+
+const owo = {line
+	if re.owo == Zptr
+		/* split b/c max 15 groups per regex or something? */
+		re.owo = std.try(regex.compile( \
+			"(notice|warning|Notice|Warning|NOTICE|WARNING)|" \
+			"(error|oops)|(Error|Oops)|(ERROR|OOPS)|" \
+			"(ove)|(OVE)|" \
+			"(au)|(Au)|(AU)|" \
+			"(f)[eou]|(F)[eou]|(F)[EOU]|" \
+			"(n)[aeiou]|(N)[aeiou]|(N)[AEIOU]"))
+		/* this could probably be better... */
+		re.owo1 = std.try(regex.compile( \
+			"(bulge)|" \
+			"(lr)|(Lr)|(LR)|" \
+			"(rl|rr)|(Rl|Rr)|(RL|RR)|" \
+			"(ll$)|(LL$)|" \
+			"(ll)\\p{Zs}|(LL)\\p{Zs}|" \
+			"(l|r)|(L|R)"))
+	;;
+	const subs = [ \
+		"*notices bulge* OwO what's this?", \
+		"wuh woh", "Wuh woh", "WUH WOH", \
+		"uv", "UV", \
+		"aw", "Aw", "AW", \
+		"fw", "Fw", "FW", \
+		"ny", "Ny", "NY"][:]
+	const subs1 = [ \
+		"bulge", \
+		"wr", "Wr", "WR", \
+		"rw", "Rw", "RW", \
+		"wl", "WL", \
+		"wl", "WL", \
+		"w", "W"][:]
+
+	var l = regex.suball(re.owo, line, subs)
+	var l1 = regex.suball(re.owo1, l, subs1)
+	std.slfree(l)
+	-> l1.len == 0 || std.rand(0, 3) != 0 ? \
+		l1 : std.sljoin(&l1, [" uwu", " OwO", " >w<", " >>>:3c"][std.rand(0, 4)])
+}
+
+const ratchet = {line
+	if re.ratchet == Zptr
+		re.ratchet = std.try(regex.compile("[^.,;!?]( )[^.,;!?]"))
+	;;
+	-> regex.suball(re.ratchet, line, [" 👏 "][:])
+}
+
+const lower = {line
+	var sb = std.mksb()
+	for c : std.bychar(line)
+		std.sbputc(sb, std.islower(c) ? c : std.tolower(c))
+	;;
+	-> std.sbfin(sb)
+}
+
+const upper = {line
+	var sb = std.mksb()
+	for c : std.bychar(line)
+		std.sbputc(sb, std.isupper(c) ? c : std.toupper(c))
+	;;
+	-> std.sbfin(sb)
+}

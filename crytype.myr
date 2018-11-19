@@ -1,0 +1,151 @@
+use regex
+use std
+use "misc"
+
+pkg fltr =
+	const crytype : (line : byte[:] -> byte[:])
+;;
+
+/* bunch of these fields should be unified make a real big boy state machine instead of this shit*/
+type state = struct
+	prev   : std.option(char)
+	last   : uint
+	word   : bool
+	mangle : bool
+;;
+
+var re
+
+/* there is a very good chance this is completely idiotic */
+const step = {state : state#
+	if state.mangle || state.last++ == 0
+		-> void
+	;;
+	const odds = [24, 16, 10, 5, 3, 2, 1]
+	if (state.mangle = std.rand(0, odds[state.last - 2]) == 0)
+		state.last = 0
+	;;
+}
+
+const punct = {sb, c
+	match c
+	| '\'': std.sbputs(sb, [";", ";", ",", ",,", ",,,"][std.rand(0, 5)])
+	| '.': std.sbputs(sb, [";", ",,", ",,", ",,,"][std.rand(0, 4)])
+	| '?': std.sbputs(sb, ["?,", "?,,"][std.rand(0, 2)])
+	| _: -> false
+	;;
+	-> true
+}
+
+const blank = {state, sb, c
+	match state.prev
+	| `std.Some p:
+		if punct(sb, p)
+			state.last = 0
+			state.mangle = false
+		else
+			std.sbputc(sb, p)
+			if state.mangle && std.rand(0, 2) == 0
+				std.sbputs(sb, [",,", ",,,", ",, ,"][std.rand(0, 3)])
+				state.last = 0
+				state.mangle = false
+			;;
+		;;
+	| _:
+	;;
+	std.sbputc(sb, c)
+	state.prev = `std.None
+	state.word = false
+}
+
+const firstchar = {state, sb, c
+	/* don't mangle the first letter of a word too badly */
+	if state.mangle && std.rand(0, 4) == 0
+		std.sbputs(sb, [";", ",,", ",,,", ", ,,"][std.rand(0, 4)])
+		state.last = 0
+		state.mangle = false
+	;;
+	state.word = true
+	std.sbputc(sb, c)
+}
+
+const nthchar = {state, sb, c
+	/* always mangle apostrophes */
+	match state.prev
+	| `std.Some p:
+		match p
+		| '\'':
+			std.sbputs(sb, [";", ";", ",", ",,", ",,,"][std.rand(0, 5)])
+			state.last = 0
+			state.mangle = false
+		| _: std.sbputc(sb, p)
+		;;
+	| _:
+	;;
+	state.prev = `std.Some c
+}
+
+const mangle = {state, sb, c
+	match state.prev
+	| `std.Some p:
+		if !punct(sb, p)
+			match std.rand(0, 5)
+			| 0: /* drop the previous char */
+			| 1: std.sbputs(sb, [";", ".", ",", ",,"][std.rand(0, 4)])
+			| 2:
+				std.sbputs(sb, [";", ".", ",", ",,"][std.rand(0, 4)])
+				std.sbputc(sb, p)
+			| 3:
+				std.sbputs(sb, [";", ".", ",", ",,", ",,,"][std.rand(0, 4)])
+				std.sbputc(sb, p)
+			| 4:
+				std.sbputc(sb, p)
+				std.sbputc(sb, p)
+			| _: std.assert(false, "unreachable\n")
+			;;
+		;;
+		state.last = 0
+		state.mangle = false
+	| _: /* mangle the next char */
+	;;
+	state.prev = `std.Some c
+}
+
+/* this whole function is a disaster tbh */
+const crytype = {line
+	if re == Zptr
+		re = std.try(regex.compile( \
+			"(sorry)|(Sorry)|(SORRY)|" \
+			"(notice|warning)|(Notice|Warning)|(NOTICE|WARNING)|" \
+			"(error|oops)|(Error|Oops)|(ERROR|OOPS)"))
+	;;
+	const subs = [ \
+		"so sorry", "So sorry", "SO SORRY", \
+		"i'm so sorry", "I'm so sorry", "I'M SO SORRY", \
+		"i'm so so sorry", "I'm so so sorry", "I'M SO SO SORRY"][:]
+
+	var l = regex.suball(re, line, subs)
+	var sb = std.mksb()
+	var state = [.prev = `std.None]
+	for c : std.bychar(l)
+		step(&state)
+		if std.isblank(c)
+			blank(&state, sb, c)
+		elif !state.word
+			firstchar(&state, sb, c)
+		elif !state.mangle
+			nthchar(&state, sb, c)
+		else
+			mangle(&state, sb, c)
+		;;
+	;;
+	match state.prev
+	| `std.Some p:
+		if !punct(sb, p)
+			std.sbputc(sb, p)
+		;;
+	| _:
+	;;
+	std.slfree(l)
+	-> std.sbfin(sb)
+}

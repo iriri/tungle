@@ -1,0 +1,62 @@
+/* bsd license blah blah */
+
+use bio
+use regex
+use std
+use "crytype"
+use "misc"
+
+const help = {err
+	std.fput(std.Err,
+		"flags:\n" \
+		"    c crytype\n" \
+		"    o owo\n" \
+		"    r ratchet\n" \
+		"    l lower\n" \
+		"    u upper\n" \
+		"    h this\n")
+	std.exit(err)
+}
+
+const parse = {args
+	if args.len == 1
+		var pipeline = std.slalloc(2)[:1]
+		pipeline[0] = [fltr.crytype, fltr.owo, fltr.ratchet][std.rand(0, 3)]
+		-> std.slpush(&pipeline, {l; std.put("{}\n", l); -> l})
+	elif args.len > 2
+		std.fput(std.Err, "too many args\n")
+		help(1)
+	;;
+
+	var pipeline = std.slalloc(args[1].len + 1)[:0]
+	for f : std.bychar(args[1][args[1][0] == ('-' : byte) ? 1 : 0:])
+		match f
+		| 'c': pipeline = std.slpush(&pipeline, fltr.crytype)
+		| 'o': pipeline = std.slpush(&pipeline, fltr.owo)
+		| 'r': pipeline = std.slpush(&pipeline, fltr.ratchet)
+		| 'l': pipeline = std.slpush(&pipeline, fltr.lower)
+		| 'u': pipeline = std.slpush(&pipeline, fltr.upper)
+		| 'h': help(0)
+		| c: std.fatal("invalid flag: {}\n", c)
+		;;
+	;;
+	-> std.slpush(&pipeline, {l; std.put("{}\n", l); -> l})
+}
+
+const main = {args : byte[:][:]
+	var in = bio.mkfile(std.In, bio.Rd)
+	var pipeline = parse(args)
+
+	/* bio.byline automatically frees the line and we don't want this */
+	for ; ;
+		match bio.readln(in)
+		| `std.Ok l:
+			for f : pipeline
+				var l1 = f(l)
+				std.slfree(l)
+				l = l1
+			;;
+		| `std.Err _: break
+		;;
+	;;
+}
