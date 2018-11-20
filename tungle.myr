@@ -1,7 +1,6 @@
 /* bsd license blah blah */
 
 use bio
-use regex
 use std
 use "crytype"
 use "misc"

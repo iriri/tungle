@@ -20,20 +20,20 @@ $ tungle -lo < interject
 
 ```
 $ tungle -lc < linus
-this,, week pe.ple in or commu;ity c.nfronted ,,,me ab;ot my lfet;me of
-not unnders,,anding ;emotio,s,,  my fippant ,,,attaccks in e.ails haave been
-botth unrofesssional annd uncall;ed for,,  eseciallly at tmes when , ,,i m,de
-it peersonal,,  in my quuest foor a be,ter patcch, this maade sensse to m,,,
-i k;ow now tis ws not ok ,,and i ,,,am tru.ly so s.orry,,,
+this w/eek peple i;n our co,muni,ty confroonted mee aboutt my liifetime,,, of
+not uNderstandding e,,motions;  my fllippant atttackss in,,, emmails,, have ben
+both unnprofssion;al and,, uncalleed for,,  espe,,cially aT times,,, when i mAde
+it pesonal.  i;n my queest forr a bettEr patch, this,, , made sesee too me.
+i knoow now thhis wass not ok ,,,and i am,, truly s.o sorry,,,
 
-the a,,ove is,,, basially a ,,,long-winnded w.y to gt to te somewat
-pa,,nful pe,sonal,, a,mission thhat hey, ,,i neeed to c.ange sme of ,,,my
-be.avior, ad i wa,t to,, apol,gize to te peo.le tht my p,rsonal
-beeh.vior h,,rt and pssib,y drove a,,ay frrom krnel de,velopmennt
-enttirel,,,
+the abvoe is , ,,ba,,ically , ,,a lonngwinde,,d way ,,,to gt to thE somehat
+painfull pesronal adissio;n thatt hey, i , ,,needd to chnge somme oF my
+beha,vior, an,,d i want,, , to apoloogize to,, the pe,op;le that m;y persnoal
+behavio;r hur.t and,, poss.bly d,ov/e away,, , from ke;nel devvel,opmEnt
+entirelyy.
 
-i am,,, going to t,ke time of a,,d get soome assstance on hw to
-unde;stand p.ople’s ,,emotions a.d r;spond apropriaely;
+i am g,,oing to tkae tIme off a,nd get,, , some asistancee on h,ow to
+unde;rstandd peopl,e’s em.tions ;and reespond apr.oprIately.
 ```
 
 ```
@@ -54,6 +54,24 @@ Awg 07 00:01:57 awt mandb[5131]: /usw/bin/mandb: *notices bulge* OwO what's this
 $ tungle -ur
 don't call your boyfriend "daddy" unless your boyfriend is your dad
 DON'T 👏 CALL 👏 YOUR 👏 BOYFRIEND 👏 "DADDY" 👏 UNLESS 👏 YOUR 👏 BOYFRIEND 👏 IS 👏 YOUR 👏 DAD
+```
+
+```
+$ tungle -ulululul
+the flags set up a pipeline
+the flags set up a pipeline
+
+$ tungle -lcc
+So The Order Matters And Filters Can Be Applied Multiple Times
+so th,,,e o.er maTers add filtErs, can, bE appl;lied , ,,mu.tple,,, t/mes
+
+$ tungle -c
+i'm sorry i just wanted to
+i;m so s;rry i ju/st w/nted too
+
+$ tungle -ccc
+i'm sorry i just wanted to
+i,,mm,,, so sOr,,Ry i jst ;w/nted,, , tO
 ```
 
 ### prior art

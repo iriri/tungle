@@ -4,17 +4,17 @@ use std
 pkg fltr =
 	const owo     : (line : byte[:] -> byte[:])
 	const ratchet : (line : byte[:] -> byte[:])
-
-	const lower : (line : byte[:] -> byte[:])
-	const upper : (line : byte[:] -> byte[:])
+	const lower   : (line : byte[:] -> byte[:])
+	const upper   : (line : byte[:] -> byte[:])
 
 	pkglocal generic Zptr : @a# = (0 : @a#)
-;;
 
-var re : struct
-	owo     : regex.regex#
-	owo1    : regex.regex#
-	ratchet : regex.regex#
+	pkglocal var re : struct
+		owo     : regex.regex#
+		owo1    : regex.regex#
+		ratchet : regex.regex#
+		crytype : regex.regex#
+	;; = [.owo = (0 : regex.regex#)]
 ;;
 
 const owo = {line
