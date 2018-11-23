@@ -17,6 +17,23 @@ pkg fltr =
 	;; = [.owo = (0 : regex.regex#)]
 ;;
 
+const owosubs = [
+	"*notices bulge* OwO what's this?",
+	"wuh woh", "Wuh woh", "WUH WOH",
+	"uv", "UV",
+	"aw", "Aw", "AW",
+	"fw", "Fw", "FW",
+	"ny", "Ny", "NY",
+][:]
+const owosubs1 = [
+	"bulge",
+	"wr", "Wr", "WR",
+	"rw", "Rw", "RW",
+	"wl", "WL",
+	"wl", "WL",
+	"w", "W",
+][:]
+
 const owo = {line
 	if re.owo == Zptr
 		/* split b/c max 15 groups per regex or something? */
@@ -36,23 +53,9 @@ const owo = {line
 			"(ll)\\p{Zs}|(LL)\\p{Zs}|" \
 			"(l|r)|(L|R)"))
 	;;
-	const subs = [ \
-		"*notices bulge* OwO what's this?", \
-		"wuh woh", "Wuh woh", "WUH WOH", \
-		"uv", "UV", \
-		"aw", "Aw", "AW", \
-		"fw", "Fw", "FW", \
-		"ny", "Ny", "NY"][:]
-	const subs1 = [ \
-		"bulge", \
-		"wr", "Wr", "WR", \
-		"rw", "Rw", "RW", \
-		"wl", "WL", \
-		"wl", "WL", \
-		"w", "W"][:]
 
-	var l = regex.suball(re.owo, line, subs)
-	var l1 = regex.suball(re.owo1, l, subs1)
+	var l = regex.suball(re.owo, line, owosubs)
+	var l1 = regex.suball(re.owo1, l, owosubs1)
 	std.slfree(l)
 	-> l1.len == 0 || std.rand(0, 3) != 0 ? \
 		l1 : std.sljoin(&l1, [" uwu", " OwO", " >w<", " >>>:3c"][std.rand(0, 4)])

@@ -1,0 +1,150 @@
+use std
+
+pkg radix =
+	type tree(@a) = struct
+		subs : tree(@a)#[4]
+		kv   : std.option((byte[:], @a))
+	;;
+
+	generic mk   : (-> tree(@a)#)
+	generic free : (t : tree(@a)# -> tree(@a)#)
+	generic put  : (t : tree(@a)#, k : byte[:], v : @a -> std.option(@a))
+	generic get  : (t : tree(@a)#, k : byte[:] -> std.option(@a))
+	generic find : (t : tree(@a)#, k : byte[:] -> tree(@a)#)
+	generic best : (t : tree(@a)#, k : byte[:] -> std.option((byte[:], @a)))
+
+	type kviter(@a) = struct
+		nodes : tree(@a)#[:]
+	;;
+	impl iterable kviter(@a) -> (byte[:], @a)
+	generic bykeyvals : (t : tree(@a)# -> kviter(@a))
+;;
+
+generic Zptr : @a#= (0 : @a#)
+
+generic mk = {
+	-> std.zalloc()
+}
+
+generic _free = {t
+	for var i = 0; i < 4; i++
+		if t.subs[i] != Zptr
+			free(t.subs[i])
+		;;
+	;;
+	std.free(t)
+}
+
+generic free = {t
+	_free(t)
+	-> Zptr
+}
+
+generic _find = {t, k, off
+	if k.len == 0
+		std.assert(off == 0, "fug\n")
+		-> (t, k, off)
+	;;
+
+	var n = t.subs[((k[0] : uint) >> off) & 0x3]
+	if n == Zptr
+		-> (t, k, off)
+	;;
+	off = (off + 2) % 8
+	-> _find(n, off > 0 ? k : k[1:], off)
+}
+
+generic _put = {t, k, off
+	if k.len == 0
+		std.assert(off == 0, "fug\n")
+		-> t
+	;;
+
+	var n = std.zalloc()
+	t.subs[((k[0] : uint) >> off) & 0x3] = n
+	off = (off + 2) % 8
+	-> _put(n, off > 0 ? k : k[1:], off)
+}
+
+generic put = {t, k, v
+	var ksub, off
+	(t, ksub, off) = _find(t, k, 0)
+	t = _put(t, ksub, off) /* doesn't compile if i declare a new var here */
+
+	var old
+	match t.kv
+	| `std.Some (_, o): old = `std.Some o
+	| `std.None: old = `std.None
+	;;
+	t.kv = `std.Some (k, v)
+	-> old
+}
+
+generic find = {t, k
+	-> _find(t, k, 0).0
+}
+
+generic get = {t, k
+	match find(t, k).kv
+	| `std.Some (_, v): -> `std.Some v
+	| `std.None: -> `std.None
+	;;
+}
+
+generic _best = {t, k, off, b
+	if std.canget(t.kv)
+		std.assert(off == 0, "fug\n")
+		b = t.kv
+	;;
+	if k.len == 0
+		std.assert(off == 0, "fug\n")
+		-> b
+	;;
+
+	var n = t.subs[((k[0] : uint) >> off) & 0x3]
+	if n == Zptr
+		-> b
+	;;
+	off = (off + 2) % 8
+	-> _best(n, off > 0 ? k : k[1:], off, b)
+}
+
+generic best = {t, k
+	-> _best(t, k, 0, `std.None)
+}
+
+impl iterable kviter(@a) -> (byte[:], @a) =
+	__iternext__ = {itp, valp
+		if itp.nodes.len == 0
+			std.slfree(itp.nodes)
+			-> false
+		;;
+
+		var n = std.slpop(&itp.nodes)
+		var pushsubs = {
+			for var i = 3; i != ~0x0; i--
+				if (n.subs[i] : std.intptr) != 0 /* Zptr doesn't work here */
+					std.slpush(&itp.nodes, n.subs[i])
+				;;
+			;;
+		}
+		match n.kv
+		| `std.Some (k, v):
+			valp# = (k, v)
+			pushsubs()
+			-> true
+		| `std.None:
+			pushsubs()
+			-> __iternext__(itp, valp)
+		;;
+		-> false
+	}
+
+	__iterfin__ = {itp, valp; }
+;;
+
+generic bykeyvals = {t
+	var n = std.slalloc(1)
+	n[0] = t
+	-> [.nodes = n]
+}

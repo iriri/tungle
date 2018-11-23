@@ -88,6 +88,12 @@ const dont = {state, sb, c
 	state.word = !std.isblank(c)
 }
 
+const crytypesubs = [
+	"so sorry", "So sorry", "SO SORRY",
+	"i'm so sorry", "I'm so sorry", "I'M SO SORRY",
+	"i'm so so sorry", "I'm so so sorry", "I'M SO SO SORRY",
+][:]
+
 /* this whole file is a disaster tbh */
 const crytype = {line
 	if re.crytype == Zptr
@@ -96,14 +102,11 @@ const crytype = {line
 			"(notice|warning)|(Notice|Warning)|(NOTICE|WARNING)|" \
 			"(error|oops)|(Error|Oops)|(ERROR|OOPS)"))
 	;;
-	const subs = [ \
-		"so sorry", "So sorry", "SO SORRY", \
-		"i'm so sorry", "I'm so sorry", "I'M SO SORRY", \
-		"i'm so so sorry", "I'm so so sorry", "I'M SO SO SORRY"][:]
 
-	var l = regex.suball(re.crytype, line, subs)
+	var l = regex.suball(re.crytype, line, crytypesubs)
 	var sb = std.mksb()
 	var state = [.mangle = `Init]
+	/* TODO: iterate by graphemes instead of chars */
 	for (c, off) : std.bycharoff(l)
 		match step(&state)
 		| `Swap p:

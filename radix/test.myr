@@ -1,0 +1,26 @@
+use std
+use "radix"
+
+const main = {
+	var t = radix.mk()
+	radix.put(t, "abc", "def")
+	radix.put(t, "abcd", "defg")
+	radix.put(t, "a", "aa")
+	radix.put(t, "aa", "aaa")
+	radix.put(t, "b", "bb")
+	radix.put(t, "ba", "bba")
+
+	std.assert(std.eq(std.get(radix.get(t, "abc")), "def"), "fug\n")
+	std.assert(std.eq(std.get(radix.get(t, "abcd")), "defg"), "fug\n")
+	var b = std.get(radix.best(t, "ab"))
+	std.assert(std.eq(b.0, "a"), "fug\n")
+	std.assert(std.eq(b.1, "aa"), "fug\n")
+
+	for (k, v) : radix.bykeyvals(radix.find(t, "a"))
+		std.put("{} {}\n", k, v)
+	;;
+	for (k, v) : radix.bykeyvals(radix.find(t, "b"))
+		std.put("{} {}\n", k, v)
+	;;
+	t = radix.free(t)
+}

@@ -3,12 +3,14 @@
 use bio
 use std
 use "crytype"
+use "emojipasta"
 use "misc"
 
 const help = {err
 	std.fput(std.Err,
 		"flags:\n" \
 		"    c crytype\n" \
+		"    e emojipasta (work in progress)\n" \
 		"    o owo\n" \
 		"    r ratchet\n" \
 		"    l lower\n" \
@@ -20,7 +22,12 @@ const help = {err
 const parse = {args
 	if args.len == 1
 		var pipeline = std.slalloc(2)[:1]
-		pipeline[0] = [fltr.crytype, fltr.owo, fltr.ratchet][std.rand(0, 3)]
+		pipeline[0] = [
+			fltr.crytype,
+			fltr.emojipasta,
+			fltr.owo,
+			fltr.ratchet,
+		][std.rand(0, 4)]
 		-> std.slpush(&pipeline, {l; std.put("{}\n", l); -> l})
 	elif args.len > 2
 		std.fput(std.Err, "too many args\n")
@@ -30,11 +37,12 @@ const parse = {args
 	var pipeline = std.slalloc(args[1].len + 1)[:0]
 	for f : std.bychar(args[1][args[1][0] == ('-' : byte) ? 1 : 0:])
 		match f
-		| 'c': pipeline = std.slpush(&pipeline, fltr.crytype)
-		| 'o': pipeline = std.slpush(&pipeline, fltr.owo)
-		| 'r': pipeline = std.slpush(&pipeline, fltr.ratchet)
-		| 'l': pipeline = std.slpush(&pipeline, fltr.lower)
-		| 'u': pipeline = std.slpush(&pipeline, fltr.upper)
+		| 'c': std.slpush(&pipeline, fltr.crytype)
+		| 'e': std.slpush(&pipeline, fltr.emojipasta)
+		| 'o': std.slpush(&pipeline, fltr.owo)
+		| 'r': std.slpush(&pipeline, fltr.ratchet)
+		| 'l': std.slpush(&pipeline, fltr.lower)
+		| 'u': std.slpush(&pipeline, fltr.upper)
 		| 'h': help(0)
 		| c: std.fatal("invalid flag: {}\n", c)
 		;;

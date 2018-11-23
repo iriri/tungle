@@ -1,0 +1,4 @@
+bin test =
+	radix.myr
+	test.myr
+;;

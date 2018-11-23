@@ -1,0 +1,64 @@
+use std
+use "misc"
+use "radix/radix"
+
+pkg fltr =
+	const emojipasta : (line : byte[:] -> byte[:])
+;;
+
+var etree
+
+/* this needs work... */
+const emap = [
+	("hit", "👊"),
+	("miss", "😳"),
+	("guess", "🤔"),
+	("never", "❌"),
+	("huh", "😕"),
+	("boyfriend", "💑"),
+	("kiss", "😘💋"),
+	("find", "🔍"),
+	("girl", "💃"),
+	("dab", "😎"),
+
+	("delet", "🙅"),
+	("error", "🚫"),
+	("true", "💯"),
+	("dadd", "💖"),
+	("daddy", "👅"),
+	("daddy's", "👨‍👧"),
+	("cum", "💦"),
+	("cummie", "💦💦"),
+	("squishy", "☁️💦"),
+	("kitten", "😻"),
+]
+
+const emojipasta = {line
+	if etree == Zptr
+		etree = radix.mk()
+		for (k, v) : emap
+			radix.put(etree, k, v)
+		;;
+	;;
+
+	/* TODO: stop using strtok */
+	var toks = std.strtok(line)
+	var sb = std.mksb()
+	for t : toks
+		std.sbputs(sb, t)
+		std.sbputc(sb, ' ')
+
+		var t1 = lower(t)
+		match radix.best(etree, t1)
+		| `std.Some (_, v):
+			var r = [0, 1, 1, 1, 2, 3][std.rand(0, 6)]
+			for var i = 0; i < r; i++
+				std.sbputs(sb, v)
+			;;
+			std.sbputc(sb, ' ')
+		| `std.None:
+		;;
+		std.slfree(t1)
+	;;
+	-> std.strstrip(std.sbfin(sb))
+}

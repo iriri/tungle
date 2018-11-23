@@ -1,5 +1,7 @@
 bin tungle =
 	misc.myr
 	crytype.myr
+	radix/radix.myr
+	emojipasta.myr
 	tungle.myr
 ;;
